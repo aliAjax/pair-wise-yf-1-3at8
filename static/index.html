@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>救助站领养管理台</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>🐾 救助站领养管理台</h1>
+  <span class="sub">申请 · 候补 · 确认 · 待复诊复核 —— 数据持久，重启继续用</span>
+  <span class="spacer"></span>
+  <span class="today" id="today"></span>
+  <button class="btn" onclick="loadState()">刷新</button>
+  <button class="btn warn" onclick="importLegacy()">导入旧表（2026-09-old）</button>
+</header>
+
+<div class="wrap">
+  <div class="rules">
+    <b>开放领养条件（同时满足）：</b>① 隔离期满；② 近 7 天内最近一次体检正常；③ 疫苗齐全（猫：猫三联+狂犬疫苗；狗：犬四联+狂犬疫苗）。
+    <b>同一动物只保留一份有效预约</b>，其余申请按登记顺序进入候补；确认时两人同时提交，也只有一笔成功。
+    到店体检异常或缺疫苗 → 预约转「待复诊」，动物不能领走；补做并复核通过后恢复有效预约。
+    体检与预约事件只追加、不覆盖，旧表记录标注「旧表」照常处理。
+  </div>
+
+  <section class="panel">
+    <h2>动物档案 <span class="count" id="animal-count"></span></h2>
+    <div id="animal-list"></div>
+  </section>
+
+  <section class="panel">
+    <h2>预约队列 <span class="count">有效 / 候补 / 待复诊 / 已结束</span></h2>
+    <div id="reservation-list"></div>
+    <div class="legend">
+      候补按「登记顺序」补位；待复诊期间不释放有效名额，候补不会越过它。
+      页面上的「并发确认演示」会用两个领养人同时确认同一份预约，可看到仅一笔成功。
+    </div>
+  </section>
+
+  <section class="panel events">
+    <h2>操作流水（只追加，永不覆盖）</h2>
+    <table class="events-table">
+      <thead><tr><th style="width:150px">时间</th><th style="width:90px">预约</th><th style="width:110px">事件</th><th>说明</th><th style="width:60px">来源</th></tr></thead>
+      <tbody id="event-list"></tbody>
+    </table>
+  </section>
+</div>
+
+<!-- 申请弹窗 -->
+<div class="modal-mask" id="apply-modal">
+  <div class="modal">
+    <h3>申请领养：<span id="apply-animal-name"></span></h3>
+    <label>选择领养人</label>
+    <select id="apply-adopter"></select>
+    <div class="hint" id="apply-hint"></div>
+    <div class="foot">
+      <button class="btn" onclick="closeModal('apply-modal')">取消</button>
+      <button class="btn primary" onclick="submitApply()">提交申请</button>
+    </div>
+  </div>
+</div>
+
+<!-- 取消弹窗 -->
+<div class="modal-mask" id="cancel-modal">
+  <div class="modal">
+    <h3>取消预约 <span id="cancel-resv" style="color:var(--muted);font-size:13px"></span></h3>
+    <label>取消原因（可选）</label>
+    <input type="text" id="cancel-reason" placeholder="如：领养人放弃 / 联系不上">
+    <div class="hint">若取消的是有效预约，最早登记的候补将自动补上。</div>
+    <div class="foot">
+      <button class="btn" onclick="closeModal('cancel-modal')">再想想</button>
+      <button class="btn danger" onclick="submitCancel()">确认取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 复诊登记弹窗 -->
+<div class="modal-mask" id="recheck-modal">
+  <div class="modal">
+    <h3>登记复诊：<span id="recheck-animal-name"></span></h3>
+    <div class="hint" id="recheck-blocked"></div>
+    <label>本次到店体检结果</label>
+    <select id="recheck-result">
+      <option value="normal">正常</option>
+      <option value="abnormal">异常</option>
+    </select>
+    <label>情况说明</label>
+    <input type="text" id="recheck-notes" placeholder="如：复查猫癣已愈">
+    <label>本次补做的疫苗（可多选）</label>
+    <div class="checks" id="recheck-vax"></div>
+    <div class="foot">
+      <button class="btn" onclick="closeModal('recheck-modal')">关闭</button>
+      <button class="btn primary" onclick="submitRecheck()">提交并复核</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+<script src="/app.js"></script>
+</body>
+</html>

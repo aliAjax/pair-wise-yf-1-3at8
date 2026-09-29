@@ -16,3 +16,8 @@ coverage/
 .idea/
 __pycache__/
 *.py[cod]
+
+# SQLite 本地数据库（首次启动自动播种，重启继续使用）
+shelter.db
+shelter.db-wal
+shelter.db-shm
