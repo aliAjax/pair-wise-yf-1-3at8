@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>救助站领养管理台</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div>
+        <h1>🐾 救助站领养管理台</h1>
+        <p class="sub" id="topSub">数据保存在服务器文件中，重启后继续使用</p>
+      </div>
+      <div class="top-actions">
+        <button class="btn" data-act="new-adopter">＋ 新领养人</button>
+        <button class="btn" data-act="new-animal">＋ 新动物</button>
+        <button class="btn btn-ghost" data-act="import-legacy">⤓ 导入旧表</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="rules-banner">
+    <strong>开放规则：</strong>隔离期满 ＋ 近 7 天体检正常 ＋ 疫苗齐全，三项同时满足才可确认领走；
+    同一动物只保留一份有效预约，其余进入候补；到店异常或缺疫苗 → 预约转<span class="tag tag-block">待复诊</span>，补做并复核后恢复；
+    取消后候补<strong>按登记顺序</strong>自动递补；两人同时确认仅一笔成功。
+  </div>
+
+  <main class="container">
+    <div class="filters" id="filters">
+      <button class="chip active" data-filter="all">全部</button>
+      <button class="chip" data-filter="open-ok">可申请</button>
+      <button class="chip" data-filter="booked">已排预约</button>
+      <button class="chip" data-filter="review">待复诊</button>
+      <button class="chip" data-filter="blocked">未开放（隔离/缺项）</button>
+      <button class="chip" data-filter="waiting">有人候补</button>
+      <button class="chip" data-filter="adopted">已领养</button>
+    </div>
+
+    <section id="animalGrid" class="grid"><!-- 动物卡片 --></section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>全部预约</h2>
+        <span class="hint">按登记顺序编号 #seq；候补与有效预约一目了然</span>
+      </div>
+      <div class="table-wrap">
+        <table id="apptTable">
+          <thead>
+            <tr>
+              <th>#</th><th>动物</th><th>领养人</th><th>状态</th><th>来源</th><th>登记时间</th><th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="two-col">
+      <section class="panel">
+        <div class="panel-head"><h2>体检记录</h2><span class="hint">只追加不覆盖，异常以红条标出</span></div>
+        <div class="table-wrap">
+          <table id="checkTable">
+            <thead><tr><th>日期</th><th>动物</th><th>结果</th><th>备注</th><th>来源</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h2>疫苗记录</h2><span class="hint">补打会新增一行，旧记录保留</span></div>
+        <div class="table-wrap">
+          <table id="vacTable">
+            <thead><tr><th>日期</th><th>动物</th><th>疫苗</th><th>来源</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel">
+      <div class="panel-head"><h2>操作流水</h2><span class="hint">申请 / 取消 / 确认 / 复诊 / 递补 / 导入 全部留痕</span></div>
+      <ul id="eventLog" class="events"></ul>
+    </section>
+  </main>
+
+  <!-- 通用弹窗 -->
+  <div class="modal-mask" id="modalMask" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="modalTitle"></h3>
+        <button class="modal-x" id="modalClose">×</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" id="modalCancel">取消</button>
+        <button class="btn btn-primary" id="modalOk">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
